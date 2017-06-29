@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dfasdl xmlns="http://www.dfasdl.org/DFASDL"
+        semantic="niem">
+  <num id="running-number" stop-sign=":"/>
+  <elem id="full-name">
+    <str id="firstname" stop-sign=","/>
+    <str id="lastname" stop-sign=","/>
+  </elem>
+  <formatnum id="salary" format="\d+\.\d+" decimal-separator="."/>
+  <str id="email"/>
+</dfasdl>

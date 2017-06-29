@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dfasdl xmlns="http://www.dfasdl.org/DFASDL"
+        semantic="niem">
+  <choice id="my-choice">
+    <celem id="branch-01">
+      <str id="branch-01-field-01" stop-sign=":"/>
+      <str id="branch-01-field-02"/>
+    </celem>
+    <celem id="branch-02">
+      <num id="branch-02-field-01" stop-sign=","/>
+      <str id="branch-02-field-02" stop-sign=","/>
+      <date id="branch-02-field-03"/>
+    </celem>
+  </choice>
+</dfasdl>
