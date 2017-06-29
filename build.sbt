@@ -73,7 +73,8 @@ lazy val settings =
   commonSettings ++
   documentationSettings ++
   gitSettings ++
-  publishSettings
+  publishSettings ++
+  resolverSettings
 
 lazy val commonSettings =
   Seq(
@@ -146,3 +147,7 @@ lazy val publishSettings =
     ))
   )
 
+lazy val resolverSettings =
+  Seq(
+    resolvers += Resolver.jcenterRepo
+  )
