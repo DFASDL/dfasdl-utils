@@ -149,5 +149,6 @@ lazy val publishSettings =
 
 lazy val resolverSettings =
   Seq(
-    resolvers += Resolver.jcenterRepo
+    resolvers += "DFASDL" at "https://dl.bintray.com/wegtam/dfasdl"
   )
+
