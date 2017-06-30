@@ -1,6 +1,7 @@
 # DFASDL Utils
 
 [![Build Status](https://travis-ci.org/DFASDL/dfasdl-utils.svg?branch=master)](https://travis-ci.org/DFASDL/dfasdl-utils)
+[![codecov](https://codecov.io/gh/DFASDL/dfasdl-utils/branch/master/graph/badge.svg)](https://codecov.io/gh/DFASDL/dfasdl-utils)
 [ ![Download](https://api.bintray.com/packages/wegtam/dfasdl/dfasdl-utils/images/download.svg) ](https://bintray.com/wegtam/dfasdl/dfasdl-utils/_latestVersion)
 
 The DFASDL is a language based upon [XML
