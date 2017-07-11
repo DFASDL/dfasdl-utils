@@ -70,11 +70,12 @@ lazy val library =
 // *****************************************************************************
 
 lazy val settings =
-  commonSettings ++
-  documentationSettings ++
-  gitSettings ++
-  publishSettings ++
-  resolverSettings
+commonSettings ++
+documentationSettings ++
+gitSettings ++
+publishSettings ++
+resolverSettings ++
+scalafmtSettings
 
 lazy val commonSettings =
   Seq(
@@ -84,10 +85,13 @@ lazy val commonSettings =
     organizationName := "Wegtam GmbH",
     startYear := Option(2014),
     licenses += ("AGPL-V3", url("https://www.gnu.org/licenses/agpl.html")),
-    headerLicense := Some(HeaderLicense.AGPLv3(s"2014 - $currentYear", "Contributors as noted in the AUTHORS.md file")),
+    headerLicense := Some(
+      HeaderLicense.AGPLv3(s"2014 - $currentYear", "Contributors as noted in the AUTHORS.md file")
+    ),
     scalacOptions ++= Seq(
       "-deprecation",
-      "-encoding", "UTF-8",
+      "-encoding",
+      "UTF-8",
       "-feature",
       "-language:_",
       "-target:jvm-1.8",
@@ -103,7 +107,7 @@ lazy val commonSettings =
     ),
     scalacOptions ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, 11)) => Seq("-Xmax-classfile-name","78") // Workaround for SI-3623.
+        case Some((2, 11)) => Seq("-Xmax-classfile-name", "78") // Workaround for SI-3623.
         case _             => Seq()
       }
     },
@@ -111,7 +115,7 @@ lazy val commonSettings =
     unmanagedSourceDirectories.in(Compile) := Seq(scalaSource.in(Compile).value),
     unmanagedSourceDirectories.in(Test) := Seq(scalaSource.in(Test).value),
     wartremoverWarnings in (Compile, compile) ++= Warts.unsafe
-)
+  )
 
 lazy val documentationSettings =
   Seq(
@@ -141,10 +145,12 @@ lazy val publishSettings =
     pomIncludeRepository := (_ => false),
     publishArtifact in Test := false,
     publish := (publish dependsOn (test in Test)).value,
-    scmInfo := Option(ScmInfo(
-      url("https://github.com/DFASDL/dfasdl-utils"),
-      "git@github.com:DFASDL/dfasdl-utils.git"
-    ))
+    scmInfo := Option(
+      ScmInfo(
+        url("https://github.com/DFASDL/dfasdl-utils"),
+        "git@github.com:DFASDL/dfasdl-utils.git"
+      )
+    )
   )
 
 lazy val resolverSettings =
@@ -152,3 +158,8 @@ lazy val resolverSettings =
     resolvers += "DFASDL" at "https://dl.bintray.com/wegtam/dfasdl"
   )
 
+lazy val scalafmtSettings =
+  Seq(
+    scalafmtOnCompile := true,
+    scalafmtVersion := "1.1.0"
+  )
