@@ -54,7 +54,7 @@ lazy val library =
       val dfasdlCore   = "1.0"
       val scalaCheck   = "1.13.5"
       val scalaCheckTb = "0.2.2"
-      val scalaTest    = "3.0.3"
+      val scalaTest    = "3.0.4"
       val shapeless    = "2.3.2"
     }
     val cats           = "org.typelevel"  %% "cats"                        % Version.cats
@@ -79,8 +79,8 @@ scalafmtSettings
 
 lazy val commonSettings =
   Seq(
-    scalaVersion in ThisBuild := "2.12.2",
-    crossScalaVersions := Seq("2.12.2", "2.11.11"),
+    scalaVersion in ThisBuild := "2.12.3",
+    crossScalaVersions := Seq("2.12.3", "2.11.11"),
     organization := "org.dfasdl",
     organizationName := "Wegtam GmbH",
     startYear := Option(2014),
