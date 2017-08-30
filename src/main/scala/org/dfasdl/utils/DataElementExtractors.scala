@@ -43,11 +43,11 @@ trait DataElementExtractors extends ElementHelpers {
     */
   def extractData(d: String, e: Element): Try[Any] =
     getDataElementType(e.getNodeName) match {
-      case DataElementType.BinaryDataElement ⇒
+      case DataElementType.BinaryDataElement =>
         extractBinaryData(d, e)
-      case DataElementType.StringDataElement ⇒
+      case DataElementType.StringDataElement =>
         extractStringData(d, e)
-      case DataElementType.UnknownElement ⇒
+      case DataElementType.UnknownElement =>
         Failure(
           new IllegalArgumentException(s"Illegal data element type! ${e.getNodeName}")
         )
@@ -65,9 +65,9 @@ trait DataElementExtractors extends ElementHelpers {
       val charset = Try(Charset.forName(e.getAttribute(AttributeNames.ENCODING)))
         .getOrElse(StandardCharsets.UTF_8)
       e.getNodeName match {
-        case BINARY     ⇒ d.getBytes(charset)
-        case BINARY_64  ⇒ java.util.Base64.getDecoder.decode(d)
-        case BINARY_HEX ⇒ javax.xml.bind.DatatypeConverter.parseHexBinary(d)
+        case BINARY     => d.getBytes(charset)
+        case BINARY_64  => java.util.Base64.getDecoder.decode(d)
+        case BINARY_HEX => javax.xml.bind.DatatypeConverter.parseHexBinary(d)
       }
     }
 
@@ -104,13 +104,15 @@ trait DataElementExtractors extends ElementHelpers {
     */
   final protected def extractStringData(d: String, e: Element): Try[Any] =
     e.getNodeName match {
-      case FORMATTED_STRING | STRING ⇒ Try(d)
-      case NUMBER ⇒
-        if (e.hasAttribute(AttributeNames.PRECISION))
+      case FORMATTED_STRING | STRING => Try(d)
+      case NUMBER =>
+        if (e.hasAttribute(AttributeNames.PRECISION) && Try(
+              e.getAttribute(AttributeNames.PRECISION).toInt > 0
+            ).toOption.contains(true))
           extractDecimal(d, e)
         else
           extractInteger(d, e)
-      case FORMATTED_NUMBER ⇒
+      case FORMATTED_NUMBER =>
         val dec: Option[String] =
           if (e.hasAttribute(AttributeNames.DECIMAL_SEPARATOR))
             Option(e.getAttribute(AttributeNames.DECIMAL_SEPARATOR))
@@ -118,17 +120,17 @@ trait DataElementExtractors extends ElementHelpers {
             None
         val del: Option[String] = None // FIXME Add an attribute for a thousands delimiter.
         extractFormattedNumber(del, dec)(d)
-      case DATE     ⇒ extractDate(d)
-      case DATETIME ⇒ extractDateTime(d)
-      case TIME     ⇒ extractTime(d)
-      case FORMATTED_TIME ⇒
+      case DATE     => extractDate(d)
+      case DATETIME => extractDateTime(d)
+      case TIME     => extractTime(d)
+      case FORMATTED_TIME =>
         extractFormattedTime(d, e) match {
-          case Failure(t)              ⇒ Failure(t)
-          case Success(Left(Left(t)))  ⇒ Success(t)
-          case Success(Left(Right(t))) ⇒ Success(t)
-          case Success(Right(t))       ⇒ Success(t)
+          case Failure(t)              => Failure(t)
+          case Success(Left(Left(t)))  => Success(t)
+          case Success(Left(Right(t))) => Success(t)
+          case Success(Right(t))       => Success(t)
         }
-      case _ ⇒
+      case _ =>
         Failure(
           new IllegalArgumentException(s"Illegal string data element type! ${e.getNodeName}")
         )
@@ -173,14 +175,14 @@ trait DataElementExtractors extends ElementHelpers {
       f: DateTimeFormatter
   )(d: String): Try[java.time.OffsetDateTime] =
     Try(java.time.OffsetDateTime.parse(d, f)) match {
-      case Failure(_) ⇒
+      case Failure(_) =>
         Try(
           java.time.OffsetDateTime.of(
             java.time.LocalDateTime.parse(d, f),
             ZoneOffset.UTC
           )
         )
-      case ot @ Success(_) ⇒ ot
+      case ot @ Success(_) => ot
     }
 
   /**
@@ -205,8 +207,8 @@ trait DataElementExtractors extends ElementHelpers {
   final protected def extractFormattedNumber(del: Option[String], dec: Option[String])(
       d: String
   ): Try[BigDecimal] = Try {
-    val clean = del.map(s ⇒ d.replace(s, "")).getOrElse(d)
-    val input = dec.map(s ⇒ clean.replace(s, ".")).getOrElse(clean)
+    val clean = del.map(s => d.replace(s, "")).getOrElse(d)
+    val input = dec.map(s => clean.replace(s, ".")).getOrElse(clean)
     new BigDecimal(input)
   }
 
@@ -252,10 +254,10 @@ trait DataElementExtractors extends ElementHelpers {
     val ld: Try[LocalDate]      = extractDate(f)(d)
     val lt: Try[LocalTime]      = extractTime(f)(d)
     (dt, ld, lt) match {
-      case (Success(t), _, _)          ⇒ Success(Right(t))
-      case (Failure(_), Success(t), _) ⇒ Success(Left(Right(t)))
-      case (Failure(_), _, Success(t)) ⇒ Success(Left(Left(t)))
-      case (Failure(x), Failure(_), Failure(_)) ⇒
+      case (Success(t), _, _)          => Success(Right(t))
+      case (Failure(_), Success(t), _) => Success(Left(Right(t)))
+      case (Failure(_), _, Success(t)) => Success(Left(Left(t)))
+      case (Failure(x), Failure(_), Failure(_)) =>
         Failure(
           new Error("Could not parse OffsetDateTime, LocalDate or LocalTime from given input!", x)
         )
@@ -282,8 +284,8 @@ trait DataElementExtractors extends ElementHelpers {
       e: Element
   ): Try[Either[Either[LocalTime, LocalDate], OffsetDateTime]] =
     for {
-      f ← Try(DateTimeFormatter.ofPattern(e.getAttribute(AttributeNames.FORMAT)))
-      t ← extractFormattedTime(f)(d)
+      f <- Try(DateTimeFormatter.ofPattern(e.getAttribute(AttributeNames.FORMAT)))
+      t <- extractFormattedTime(f)(d)
     } yield t
 
   /**

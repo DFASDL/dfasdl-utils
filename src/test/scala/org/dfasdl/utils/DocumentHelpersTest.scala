@@ -92,7 +92,7 @@ class DocumentHelpersTest extends BaseSpec with DocumentHelpers {
             val branch   = doc.getElementById("branch-02")
             val elements = analyzeChoiceBranch(branch)
             elements.size should be(3)
-            for (count ← 1 to 3) {
+            for (count <- 1 to 3) {
               val e = elements(count - 1)
               e.getAttribute("id") should be(s"branch-02-field-0$count")
             }
@@ -135,7 +135,7 @@ class DocumentHelpersTest extends BaseSpec with DocumentHelpers {
             ("str", "division")
           )
 
-          expectedMetaData zip dataElements foreach { e ⇒
+          expectedMetaData zip dataElements foreach { e =>
             e._2.getNodeName shouldEqual e._1._1
             e._2.getAttribute("id") shouldEqual e._1._2
           }
@@ -169,7 +169,7 @@ class DocumentHelpersTest extends BaseSpec with DocumentHelpers {
             ("str", "level")
           )
 
-          expectedMetaData zip dataElements foreach { e ⇒
+          expectedMetaData zip dataElements foreach { e =>
             e._2.getNodeName shouldEqual e._1._1
             e._2.getAttribute("id") shouldEqual e._1._2
           }
