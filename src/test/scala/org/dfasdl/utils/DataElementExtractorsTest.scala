@@ -34,10 +34,10 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
     it("should work for standard binary strings") {
       val e = doc.createElement(ElementNames.BINARY)
 
-      forAll { str: String ⇒
+      forAll { str: String =>
         extractBinaryData(str, e) match {
-          case Failure(t) ⇒ fail(t.getMessage)
-          case Success(b) ⇒ b should be(str.getBytes(StandardCharsets.UTF_8))
+          case Failure(t) => fail(t.getMessage)
+          case Success(b) => b should be(str.getBytes(StandardCharsets.UTF_8))
         }
       }
     }
@@ -45,11 +45,11 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
     it("should work for base 64 encoded strings") {
       val e = doc.createElement(ElementNames.BINARY_64)
 
-      forAll { bs: Array[Byte] ⇒
+      forAll { bs: Array[Byte] =>
         val enc = java.util.Base64.getEncoder.encodeToString(bs)
         extractBinaryData(enc, e) match {
-          case Failure(t) ⇒ fail(t.getMessage)
-          case Success(b) ⇒ b should be(bs)
+          case Failure(t) => fail(t.getMessage)
+          case Success(b) => b should be(bs)
         }
       }
     }
@@ -57,11 +57,11 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
     it("should work for hexadecimal encoded strings") {
       val e = doc.createElement(ElementNames.BINARY_HEX)
 
-      forAll { bs: Array[Byte] ⇒
+      forAll { bs: Array[Byte] =>
         val enc = bs.map("%02x".format(_)).mkString
         extractBinaryData(enc, e) match {
-          case Failure(t) ⇒ fail(t.getMessage)
-          case Success(b) ⇒ b should be(bs)
+          case Failure(t) => fail(t.getMessage)
+          case Success(b) => b should be(bs)
         }
       }
     }
@@ -69,24 +69,24 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
 
   describe("extractDate") {
     it("should work for correct dates") {
-      forAll { zdt: ZonedDateTime ⇒
+      forAll { zdt: ZonedDateTime =>
         val ld = zdt.toLocalDate
         val s  = ld.toString
         extractDate(s) match {
-          case Failure(t) ⇒ fail(t.getMessage)
-          case Success(t) ⇒ t should be(ld)
+          case Failure(t) => fail(t.getMessage)
+          case Success(t) => t should be(ld)
         }
       }
     }
 
     it("should work for correct dates with correct format") {
-      forAll { zdt: ZonedDateTime ⇒
+      forAll { zdt: ZonedDateTime =>
         val f  = DateTimeFormatter.ISO_ZONED_DATE_TIME
         val ld = zdt.toLocalDate
         val s  = zdt.toString
         extractDate(f)(s) match {
-          case Failure(t) ⇒ fail(t.getMessage)
-          case Success(t) ⇒ t should be(ld)
+          case Failure(t) => fail(t.getMessage)
+          case Success(t) => t should be(ld)
         }
       }
     }
@@ -94,42 +94,42 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
 
   describe("extractDateTime") {
     it("should work for correct offset datetimes") {
-      forAll { zdt: ZonedDateTime ⇒
+      forAll { zdt: ZonedDateTime =>
         val s = zdt.toOffsetDateTime.toString
         extractDateTime(s) match {
-          case Failure(t) ⇒ fail(t.getMessage)
-          case Success(t) ⇒ t should be(zdt.toOffsetDateTime)
+          case Failure(t) => fail(t.getMessage)
+          case Success(t) => t should be(zdt.toOffsetDateTime)
         }
       }
     }
 
     it("should work for correct zoned datetimes with correct format") {
-      forAll { zdt: ZonedDateTime ⇒
+      forAll { zdt: ZonedDateTime =>
         val f = DateTimeFormatter.ISO_ZONED_DATE_TIME
         val s = zdt.toString
         extractDateTime(f)(s) match {
-          case Failure(t) ⇒ fail(t.getMessage)
-          case Success(t) ⇒ t should be(zdt.toOffsetDateTime)
+          case Failure(t) => fail(t.getMessage)
+          case Success(t) => t should be(zdt.toOffsetDateTime)
         }
       }
     }
 
     it("should work for correct local datetimes with correct format") {
-      forAll { zdt: ZonedDateTime ⇒
+      forAll { zdt: ZonedDateTime =>
         val f = DateTimeFormatter.ISO_LOCAL_DATE_TIME
         val s = zdt.toLocalDateTime.toString
         extractDateTime(f)(s) match {
-          case Failure(t) ⇒ fail(t.getMessage)
-          case Success(t) ⇒ t should be(OffsetDateTime.of(zdt.toLocalDateTime, ZoneOffset.UTC))
+          case Failure(t) => fail(t.getMessage)
+          case Success(t) => t should be(OffsetDateTime.of(zdt.toLocalDateTime, ZoneOffset.UTC))
         }
       }
     }
 
     it("should fail for arbitrary strings") {
-      forAll { str: String ⇒
+      forAll { str: String =>
         extractDateTime(str) match {
-          case Failure(_) ⇒ // We expect a failure here.
-          case Success(_) ⇒ fail("Parsing invalid strings should fail!")
+          case Failure(_) => // We expect a failure here.
+          case Success(_) => fail("Parsing invalid strings should fail!")
         }
       }
     }
@@ -139,7 +139,7 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
     val doc = createNewDocument()
 
     it("should work for valid input") {
-      forAll { l: Long ⇒
+      forAll { l: Long =>
         val e = doc.createElement(ElementNames.NUMBER)
         val p: Int =
           if (l < 100L)
@@ -152,8 +152,8 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
         val exp = java.math.BigDecimal.valueOf(l, p)
 
         extractDecimal(l.toString, e) match {
-          case Failure(t) ⇒ fail(t.getMessage)
-          case Success(d) ⇒ d.compareTo(exp) should be(0)
+          case Failure(t) => fail(t.getMessage)
+          case Success(d) => d.compareTo(exp) should be(0)
         }
       }
     }
@@ -164,12 +164,12 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
       describe("without decimal separator") {
         describe("using valid input") {
           it("should work") {
-            forAll { d: BigDecimal ⇒
+            forAll { d: BigDecimal =>
               val dec   = d.bigDecimal
               val input = dec.toPlainString
               extractFormattedNumber(input) match {
-                case Failure(t) ⇒ fail(t)
-                case Success(n) ⇒ n.compareTo(dec) should be(0)
+                case Failure(t) => fail(t)
+                case Success(n) => n.compareTo(dec) should be(0)
               }
             }
           }
@@ -179,12 +179,12 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
       describe("with decimal separator") {
         describe("using valid input") {
           it("should work") {
-            forAll { d: BigDecimal ⇒
+            forAll { d: BigDecimal =>
               val dec   = d.bigDecimal
               val input = dec.toPlainString.replace(".", ",,")
               extractFormattedNumber(Option(",,"))(input) match {
-                case Failure(t) ⇒ fail(t)
-                case Success(n) ⇒ n.compareTo(dec) should be(0)
+                case Failure(t) => fail(t)
+                case Success(n) => n.compareTo(dec) should be(0)
               }
             }
           }
@@ -205,7 +205,7 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
 
         val p = prefix.reverse.zipWithIndex
           .map(
-            t ⇒
+            t =>
               if ((t._2 + 1) % 3 == 0)
                 s"${t._1}$del"
               else
@@ -232,12 +232,12 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
       describe("without decimal separator") {
         describe("using valid input") {
           it("should work") {
-            forAll { d: BigDecimal ⇒
+            forAll { d: BigDecimal =>
               val dec   = d.bigDecimal
               val input = addThousandsDelimiter("ABBA", d)
               extractFormattedNumber(Option("ABBA"), None)(input) match {
-                case Failure(t) ⇒ fail(t)
-                case Success(n) ⇒ n.compareTo(dec) should be(0)
+                case Failure(t) => fail(t)
+                case Success(n) => n.compareTo(dec) should be(0)
               }
             }
           }
@@ -247,12 +247,12 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
       describe("with decimal separator") {
         describe("using valid input") {
           it("should work") {
-            forAll { d: BigDecimal ⇒
+            forAll { d: BigDecimal =>
               val dec   = d.bigDecimal
               val input = addThousandsDelimiter("ABBA", d).replace(".", "FANCY")
               extractFormattedNumber(Option("ABBA"), Option("FANCY"))(input) match {
-                case Failure(t) ⇒ fail(t)
-                case Success(n) ⇒ n.compareTo(dec) should be(0)
+                case Failure(t) => fail(t)
+                case Success(n) => n.compareTo(dec) should be(0)
               }
             }
           }
@@ -264,34 +264,34 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
   describe("extractFormattedTime") {
     describe("using valid input and format") {
       it("should prefer OffsetDateTime first") {
-        forAll { zdt: ZonedDateTime ⇒
+        forAll { zdt: ZonedDateTime =>
           val input  = zdt.toString
           val format = DateTimeFormatter.ISO_ZONED_DATE_TIME
           extractFormattedTime(format)(input) match {
-            case Failure(t) ⇒ fail(t)
-            case Success(t) ⇒ t should be(Right(zdt.toOffsetDateTime))
+            case Failure(t) => fail(t)
+            case Success(t) => t should be(Right(zdt.toOffsetDateTime))
           }
         }
       }
 
       it("should prefer LocalDate second") {
-        forAll { zdt: ZonedDateTime ⇒
+        forAll { zdt: ZonedDateTime =>
           val input  = zdt.toLocalDate.toString
           val format = DateTimeFormatter.ISO_LOCAL_DATE
           extractFormattedTime(format)(input) match {
-            case Failure(t) ⇒ fail(t)
-            case Success(t) ⇒ t should be(Left(Right(zdt.toLocalDate)))
+            case Failure(t) => fail(t)
+            case Success(t) => t should be(Left(Right(zdt.toLocalDate)))
           }
         }
       }
 
       it("should prefer LocalTime last") {
-        forAll { zdt: ZonedDateTime ⇒
+        forAll { zdt: ZonedDateTime =>
           val input  = zdt.toLocalTime.toString
           val format = DateTimeFormatter.ISO_LOCAL_TIME
           extractFormattedTime(format)(input) match {
-            case Failure(t) ⇒ fail(t)
-            case Success(t) ⇒ t should be(Left(Left(zdt.toLocalTime)))
+            case Failure(t) => fail(t)
+            case Success(t) => t should be(Left(Left(zdt.toLocalTime)))
           }
         }
       }
@@ -302,11 +302,11 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
         val input  = "I am just a lonely string..."
         val format = DateTimeFormatter.ISO_OFFSET_DATE_TIME
         extractFormattedTime(format)(input) match {
-          case Failure(t) ⇒
+          case Failure(t) =>
             t.getMessage should be(
               "Could not parse OffsetDateTime, LocalDate or LocalTime from given input!"
             )
-          case Success(_) ⇒ fail("Error expected for invalid input!")
+          case Success(_) => fail("Error expected for invalid input!")
         }
       }
     }
@@ -316,12 +316,59 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
     val doc = createNewDocument()
 
     it("should work for valid input") {
-      forAll { l: Long ⇒
+      forAll { l: Long =>
         val e = doc.createElement(ElementNames.NUMBER)
 
         extractInteger(l.toString, e) match {
-          case Failure(t) ⇒ fail(t.getMessage)
-          case Success(n) ⇒ n should be(l)
+          case Failure(t) => fail(t.getMessage)
+          case Success(n) => n should be(l)
+        }
+      }
+    }
+  }
+
+  describe("extractStringData") {
+    val doc = createNewDocument()
+
+    it("should use extractInteger for num fields without precision") {
+      forAll { l: Long =>
+        val e = doc.createElement(ElementNames.NUMBER)
+
+        extractStringData(l.toString, e) match {
+          case Failure(t) => fail(t.getMessage)
+          case Success(n) =>
+            n shouldBe a[java.lang.Long]
+            n should be(l)
+        }
+      }
+    }
+
+    it("should use extractInteger for num fields with precision == 0") {
+      forAll { l: Long =>
+        val e = doc.createElement(ElementNames.NUMBER)
+        e.setAttribute(AttributeNames.PRECISION, "0")
+
+        extractStringData(l.toString, e) match {
+          case Failure(t) => fail(t.getMessage)
+          case Success(n) =>
+            n shouldBe a[java.lang.Long]
+            n should be(l)
+        }
+      }
+    }
+
+    it("should use extractDecimal for num fields with precision > 0") {
+      forAll { l: Long =>
+        whenever(l > 100L) {
+          val e = doc.createElement(ElementNames.NUMBER)
+          e.setAttribute(AttributeNames.PRECISION, "2")
+
+          extractStringData(l.toString, e) match {
+            case Failure(t) => fail(t.getMessage)
+            case Success(n: java.math.BigDecimal) =>
+              n.compareTo(java.math.BigDecimal.valueOf(l, 2)) should be(0)
+            case Success(t) => fail(s"Invalid return type '${t.getClass.getCanonicalName}'!")
+          }
         }
       }
     }
@@ -329,23 +376,23 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
 
   describe("extractTime") {
     it("should work for correct times") {
-      forAll { zdt: ZonedDateTime ⇒
+      forAll { zdt: ZonedDateTime =>
         val lt = zdt.toLocalTime
         val s  = lt.toString
         extractTime(s) match {
-          case Failure(t) ⇒ fail(t.getMessage)
-          case Success(t) ⇒ t should be(lt)
+          case Failure(t) => fail(t.getMessage)
+          case Success(t) => t should be(lt)
         }
       }
     }
 
     it("should work for correct datetimes with correct format") {
-      forAll { zdt: ZonedDateTime ⇒
+      forAll { zdt: ZonedDateTime =>
         val f = DateTimeFormatter.ISO_OFFSET_DATE_TIME
         val s = zdt.toOffsetDateTime.toString
         extractTime(f)(s) match {
-          case Failure(t) ⇒ fail(t.getMessage)
-          case Success(t) ⇒ t should be(zdt.toLocalTime)
+          case Failure(t) => fail(t.getMessage)
+          case Success(t) => t should be(zdt.toLocalTime)
         }
       }
     }

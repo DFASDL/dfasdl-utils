@@ -49,11 +49,11 @@ trait DocumentHelpers extends ElementHelpers {
       Map.empty[Element, List[Element]]
     else {
       val candidates =
-        for (count ← 0 until choice.getChildNodes.getLength;
+        for (count <- 0 until choice.getChildNodes.getLength;
              c = choice.getChildNodes.item(count)
              if c != null && c.getNodeName == ElementNames.CHOICE_ELEMENT)
           yield
-            Map(c.asInstanceOf[Element] → getChildDataElementsFromElement(c.asInstanceOf[Element]))
+            Map(c.asInstanceOf[Element] -> getChildDataElementsFromElement(c.asInstanceOf[Element]))
       candidates.flatten.toMap
     }
   }
@@ -160,7 +160,7 @@ trait DocumentHelpers extends ElementHelpers {
     */
   def getUniqueDataElements(doc: Document): Set[Element] = {
     val es = getChildDataElementsFromElement(doc.getDocumentElement)
-    es.filter(e ⇒ isUniqueDataElement(e)).toSet
+    es.filter(e => isUniqueDataElement(e)).toSet
   }
 
   /**

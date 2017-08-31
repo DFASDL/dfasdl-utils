@@ -46,7 +46,7 @@ trait DataElementProcessors {
         else
           element.getAttribute(AttributeNames.DECIMAL_SEPARATOR)
       val allowedCharacters = s"[\\d$separatorRegex]"
-      val cleanedData       = data filter (c ⇒ s"$c" matches allowedCharacters)
+      val cleanedData       = data filter (c => s"$c" matches allowedCharacters)
       if (data.startsWith("-"))
         s"-$cleanedData"
       else
@@ -195,9 +195,9 @@ trait DataElementProcessors {
   def trimString(data: String, mode: String): String = {
     val trimCharacters = " \t\n\r"
     mode match {
-      case "left"  ⇒ data.dropWhile(c ⇒ trimCharacters.indexOf(c.toLong) >= 0)
-      case "right" ⇒ data.reverse.dropWhile(c ⇒ trimCharacters.indexOf(c.toLong) >= 0).reverse
-      case "both"  ⇒ data.trim
+      case "left"  => data.dropWhile(c => trimCharacters.indexOf(c.toLong) >= 0)
+      case "right" => data.reverse.dropWhile(c => trimCharacters.indexOf(c.toLong) >= 0).reverse
+      case "both"  => data.trim
     }
   }
 }

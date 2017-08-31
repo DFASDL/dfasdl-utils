@@ -161,5 +161,7 @@ lazy val resolverSettings =
 lazy val scalafmtSettings =
   Seq(
     scalafmtOnCompile := true,
-    scalafmtVersion := "1.1.0"
+    scalafmtOnCompile.in(Sbt) := false,
+    scalafmtVersion := "1.2.0"
   )
+

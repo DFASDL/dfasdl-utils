@@ -120,13 +120,13 @@ trait ElementHelpers {
   def getStructureElementType(tagName: String): StructureElementType =
     if (isStructuralElement(tagName)) {
       tagName match {
-        case ElementNames.CHOICE         ⇒ StructureElementType.Choice
-        case ElementNames.CHOICE_ELEMENT ⇒ StructureElementType.ChoiceElement
-        case ElementNames.CUSTOM_ID      ⇒ StructureElementType.CustomId
-        case ElementNames.ELEMENT        ⇒ StructureElementType.Element
-        case ElementNames.FIXED_SEQUENCE ⇒ StructureElementType.FixedSequence
-        case ElementNames.REFERENCE      ⇒ StructureElementType.Reference
-        case ElementNames.SEQUENCE       ⇒ StructureElementType.Sequence
+        case ElementNames.CHOICE         => StructureElementType.Choice
+        case ElementNames.CHOICE_ELEMENT => StructureElementType.ChoiceElement
+        case ElementNames.CUSTOM_ID      => StructureElementType.CustomId
+        case ElementNames.ELEMENT        => StructureElementType.Element
+        case ElementNames.FIXED_SEQUENCE => StructureElementType.FixedSequence
+        case ElementNames.REFERENCE      => StructureElementType.Reference
+        case ElementNames.SEQUENCE       => StructureElementType.Sequence
       }
     } else
       StructureElementType.Unknown
