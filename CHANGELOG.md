@@ -20,6 +20,12 @@ Please follow the listed conventions when editing this file:
 
 ## Unreleased
 
+## 2.0.0 (2017-08-31)
+
+### Fixed
+
+- extractor for num elements returns always decimal (even for `precision=0`)
+
 ## 1.0.0 (2017-06-29)
 
 - initial public release
