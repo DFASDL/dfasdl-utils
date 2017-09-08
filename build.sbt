@@ -111,7 +111,6 @@ lazy val commonSettings =
         case _             => Seq()
       }
     },
-    incOptions := incOptions.value.withNameHashing(nameHashing = true),
     unmanagedSourceDirectories.in(Compile) := Seq(scalaSource.in(Compile).value),
     unmanagedSourceDirectories.in(Test) := Seq(scalaSource.in(Test).value),
     wartremoverWarnings in (Compile, compile) ++= Warts.unsafe
