@@ -22,6 +22,7 @@ import java.nio.charset.{ Charset, StandardCharsets }
 import java.time._
 import java.time.format.DateTimeFormatter
 
+import org.dfasdl.utils.types._
 import org.dfasdl.utils.ElementNames._
 import org.w3c.dom.Element
 
@@ -41,10 +42,13 @@ trait DataElementExtractors extends ElementHelpers {
     * @param e The element that describes the data.
     * @return Either an error or the extracted data type.
     */
-  def extractData(d: String, e: Element): Try[Any] =
+  def extractData(d: String, e: Element): Try[DataElement] =
     getDataElementType(e.getNodeName) match {
       case DataElementType.BinaryDataElement =>
-        extractBinaryData(d, e)
+        Try(extractBinaryData(d, e)) match {
+          case Failure(f) => Failure(f)
+          case Success(s) => Success(BinaryE(s))
+        }
       case DataElementType.StringDataElement =>
         extractStringData(d, e)
       case DataElementType.UnknownElement =>
@@ -60,16 +64,15 @@ trait DataElementExtractors extends ElementHelpers {
     * @param e The element that describes the data.
     * @return Either an error or the extracted binary data.
     */
-  final protected def extractBinaryData(d: String, e: Element): Try[Array[Byte]] =
-    Try {
-      val charset = Try(Charset.forName(e.getAttribute(AttributeNames.ENCODING)))
-        .getOrElse(StandardCharsets.UTF_8)
-      e.getNodeName match {
-        case BINARY     => d.getBytes(charset)
-        case BINARY_64  => java.util.Base64.getDecoder.decode(d)
-        case BINARY_HEX => javax.xml.bind.DatatypeConverter.parseHexBinary(d)
-      }
+  final protected def extractBinaryData(d: String, e: Element): Array[Byte] = {
+    val charset = Try(Charset.forName(e.getAttribute(AttributeNames.ENCODING)))
+      .getOrElse(StandardCharsets.UTF_8)
+    e.getNodeName match {
+      case BINARY     => d.getBytes(charset)
+      case BINARY_64  => java.util.Base64.getDecoder.decode(d)
+      case BINARY_HEX => javax.xml.bind.DatatypeConverter.parseHexBinary(d)
     }
+  }
 
   /**
     * Extract a decimal number from the given string data.
@@ -102,16 +105,16 @@ trait DataElementExtractors extends ElementHelpers {
     * @param e The element that describes the data.
     * @return Either an error or the extracted data.
     */
-  final protected def extractStringData(d: String, e: Element): Try[Any] =
+  final protected def extractStringData(d: String, e: Element): Try[DataElement] =
     e.getNodeName match {
-      case FORMATTED_STRING | STRING => Try(d)
+      case FORMATTED_STRING | STRING => Try(StringE(d))
       case NUMBER =>
         if (e.hasAttribute(AttributeNames.PRECISION) && Try(
               e.getAttribute(AttributeNames.PRECISION).toInt > 0
             ).toOption.contains(true))
-          extractDecimal(d, e)
+          extractDecimal(d, e).map(n => DecimalE(n))
         else
-          extractInteger(d, e)
+          extractInteger(d, e).map(n => IntegerE(n))
       case FORMATTED_NUMBER =>
         val dec: Option[String] =
           if (e.hasAttribute(AttributeNames.DECIMAL_SEPARATOR))
@@ -119,16 +122,16 @@ trait DataElementExtractors extends ElementHelpers {
           else
             None
         val del: Option[String] = None // FIXME Add an attribute for a thousands delimiter.
-        extractFormattedNumber(del, dec)(d)
-      case DATE     => extractDate(d)
-      case DATETIME => extractDateTime(d)
-      case TIME     => extractTime(d)
+        extractFormattedNumber(del, dec)(d).map(n => DecimalE(n))
+      case DATE     => extractDate(d).map(v => LocalDateE(v))
+      case DATETIME => extractDateTime(d).map(v => OffsetDateTimeE(v))
+      case TIME     => extractTime(d).map(v => LocalTimeE(v))
       case FORMATTED_TIME =>
         extractFormattedTime(d, e) match {
           case Failure(t)              => Failure(t)
-          case Success(Left(Left(t)))  => Success(t)
-          case Success(Left(Right(t))) => Success(t)
-          case Success(Right(t))       => Success(t)
+          case Success(Left(Left(t)))  => Success(LocalTimeE(t))
+          case Success(Left(Right(t))) => Success(LocalDateE(t))
+          case Success(Right(t))       => Success(OffsetDateTimeE(t))
         }
       case _ =>
         Failure(

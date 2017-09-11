@@ -22,11 +22,242 @@ import java.time.format.DateTimeFormatter
 import java.time.{ OffsetDateTime, ZoneOffset, ZonedDateTime }
 
 import com.fortysevendeg.scalacheck.datetime.jdk8.ArbitraryJdk8._
+import org.dfasdl.utils.types.extractors._
 import org.scalatest.prop.PropertyChecks
 
 import scala.util.{ Failure, Success }
 
 class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataElementExtractors {
+
+  describe("extractData") {
+    val doc = createNewDocument()
+
+    describe("given an unknown element") {
+      it("should return a failure") {
+        forAll("StringData") { d: String =>
+          val e = doc.createElement("a" + scala.util.Random.alphanumeric.take(15).mkString) // XML node names must start with a letter.
+          extractData(d, e) match {
+            case Failure(f) => f shouldBe a[IllegalArgumentException]
+            case Success(_) => fail("Data extraction on unknown element must fail!")
+          }
+        }
+      }
+    }
+
+    describe("given a binary element") {
+      it("should extract the correct data") {
+        val e = doc.createElement(ElementNames.BINARY)
+
+        forAll { str: String =>
+          extractData(str, e) match {
+            case Failure(f) => fail(f.getMessage)
+            case Success(d) => getBinary(d) should contain(str.getBytes(StandardCharsets.UTF_8))
+          }
+        }
+      }
+    }
+
+    describe("given a string element") {
+      describe("containing a string") {
+        it("should extract the correct data") {
+          val e = doc.createElement(ElementNames.STRING)
+
+          forAll { str: String =>
+            extractData(str, e) match {
+              case Failure(f) => fail(f.getMessage)
+              case Success(d) => getString(d) should contain(str)
+            }
+          }
+        }
+      }
+
+      describe("containing an integer number") {
+        it("should extract the correct data") {
+          val e = doc.createElement(ElementNames.NUMBER)
+
+          forAll { n: Long =>
+            extractData(n.toString, e) match {
+              case Failure(f) => fail(f.getMessage)
+              case Success(d) => getInteger(d) should contain(n)
+            }
+          }
+        }
+      }
+
+      describe("containing a decimal number") {
+        it("should extract the correct data") {
+          val e = doc.createElement(ElementNames.NUMBER)
+
+          forAll { l: Long =>
+            whenever(l > 100L) {
+              val p = 3
+
+              e.setAttribute(AttributeNames.PRECISION, p.toString)
+
+              val exp = java.math.BigDecimal.valueOf(l, p)
+
+              extractData(l.toString, e) match {
+                case Failure(t) => fail(t.getMessage)
+                case Success(d) =>
+                  withClue(s"Wrong number returned (got $d, expected $exp)!")(
+                    getDecimal(d).exists(_.compareTo(exp) == 0) should be(true)
+                  )
+              }
+            }
+          }
+        }
+      }
+
+      describe("containing a formatted number") {
+        describe("with decimal separator") {
+          it("should extract the correct data") {
+            val e = doc.createElement(ElementNames.FORMATTED_NUMBER)
+
+            forAll { bd: BigDecimal =>
+              val dec   = bd.bigDecimal
+              val input = dec.toPlainString.replace(".", ",,")
+              e.setAttribute(AttributeNames.DECIMAL_SEPARATOR, ",,")
+              extractData(input, e) match {
+                case Failure(t) => fail(t)
+                case Success(d) =>
+                  withClue(s"Wrong number returned (got $d, expected $dec)!")(
+                    getDecimal(d).exists(_.compareTo(dec) == 0) should be(true)
+                  )
+              }
+            }
+          }
+        }
+
+        describe("without decimal separator") {
+          it("should extract the correct data") {
+            val e = doc.createElement(ElementNames.FORMATTED_NUMBER)
+
+            forAll { bd: BigDecimal =>
+              val dec   = bd.bigDecimal
+              val input = dec.toPlainString
+              extractData(input, e) match {
+                case Failure(t) => fail(t)
+                case Success(d) =>
+                  withClue(s"Wrong number returned (got $d, expected $dec)!")(
+                    getDecimal(d).exists(_.compareTo(dec) == 0) should be(true)
+                  )
+              }
+            }
+          }
+        }
+      }
+
+      describe("containing a date") {
+        it("should extract the correct data") {
+          val e = doc.createElement(ElementNames.DATE)
+
+          forAll { zdt: ZonedDateTime =>
+            val ld = zdt.toLocalDate
+            val s  = ld.toString
+            extractData(s, e) match {
+              case Failure(t) => fail(t.getMessage)
+              case Success(d) => getLocalDate(d) should contain(ld)
+            }
+          }
+        }
+      }
+
+      describe("containing a datetime") {
+        it("should extract the correct data") {
+          val e = doc.createElement(ElementNames.DATETIME)
+
+          forAll { zdt: ZonedDateTime =>
+            val s = zdt.toOffsetDateTime.toString
+            extractData(s, e) match {
+              case Failure(t) => fail(t.getMessage)
+              case Success(d) => getOffsetDateTime(d) should contain(zdt.toOffsetDateTime)
+            }
+          }
+        }
+      }
+
+      describe("containing a time") {
+        it("should extract the correct data") {
+          val e = doc.createElement(ElementNames.TIME)
+
+          forAll { zdt: ZonedDateTime =>
+            val lt = zdt.toLocalTime
+            val s  = lt.toString
+            extractData(s, e) match {
+              case Failure(t) => fail(t.getMessage)
+              case Success(d) => getLocalTime(d) should contain(lt)
+            }
+          }
+        }
+      }
+
+      describe("containing a formatted time") {
+        describe("which is a date") {
+          it("should extract the correct data") {
+            val e = doc.createElement(ElementNames.FORMATTED_TIME)
+
+            forAll { zdt: ZonedDateTime =>
+              val ld = zdt.toLocalDate
+              val s  = ld.toString
+
+              val fm = "uuuu-MM-dd"
+              e.setAttribute(AttributeNames.FORMAT, fm)
+
+              withClue(s"Could not parse '$s' using format '$fm'!") {
+                extractData(s, e) match {
+                  case Failure(t) => fail(t.getMessage)
+                  case Success(d) => getLocalDate(d) should contain(ld)
+                }
+              }
+            }
+          }
+        }
+
+        describe("which is a datetime") {
+          it("should extract the correct data") {
+            val e = doc.createElement(ElementNames.FORMATTED_TIME)
+
+            forAll { zdt: ZonedDateTime =>
+              val od = zdt.toLocalDateTime
+              val s  = od.toString
+
+              val fm = "uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSS"
+              e.setAttribute(AttributeNames.FORMAT, fm)
+
+              withClue(s"Could not parse '$s' using format '$fm'!") {
+                extractData(s, e) match {
+                  case Failure(t) => fail(t.getMessage)
+                  case Success(d) =>
+                    getOffsetDateTime(d) should contain(od.atOffset(ZoneOffset.UTC))
+                }
+              }
+            }
+          }
+        }
+
+        describe("which is a time") {
+          it("should extract the correct data") {
+            val e = doc.createElement(ElementNames.FORMATTED_TIME)
+
+            forAll { zdt: ZonedDateTime =>
+              val lt = zdt.toLocalTime
+              val s  = lt.toString
+
+              val fm = "HH:mm:ss.SSSSSSSSS"
+              e.setAttribute(AttributeNames.FORMAT, fm)
+
+              withClue(s"Could not parse '$s' using format '$fm'!") {
+                extractData(s, e) match {
+                  case Failure(t) => fail(t.getMessage)
+                  case Success(d) => getLocalTime(d) should contain(lt)
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 
   describe("extractBinaryData") {
     val doc = createNewDocument()
@@ -35,10 +266,7 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
       val e = doc.createElement(ElementNames.BINARY)
 
       forAll { str: String =>
-        extractBinaryData(str, e) match {
-          case Failure(t) => fail(t.getMessage)
-          case Success(b) => b should be(str.getBytes(StandardCharsets.UTF_8))
-        }
+        extractBinaryData(str, e) should be(str.getBytes(StandardCharsets.UTF_8))
       }
     }
 
@@ -47,10 +275,7 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
 
       forAll { bs: Array[Byte] =>
         val enc = java.util.Base64.getEncoder.encodeToString(bs)
-        extractBinaryData(enc, e) match {
-          case Failure(t) => fail(t.getMessage)
-          case Success(b) => b should be(bs)
-        }
+        extractBinaryData(enc, e) should be(bs)
       }
     }
 
@@ -59,10 +284,7 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
 
       forAll { bs: Array[Byte] =>
         val enc = bs.map("%02x".format(_)).mkString
-        extractBinaryData(enc, e) match {
-          case Failure(t) => fail(t.getMessage)
-          case Success(b) => b should be(bs)
-        }
+        extractBinaryData(enc, e) should be(bs)
       }
     }
   }
@@ -222,9 +444,9 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
 
         val p3 =
           if (dec < 0)
-            s"-${p2}.$suffix"
+            s"-$p2.$suffix"
           else
-            s"${p2}.$suffix"
+            s"$p2.$suffix"
 
         p3
       }
@@ -336,9 +558,7 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
 
         extractStringData(l.toString, e) match {
           case Failure(t) => fail(t.getMessage)
-          case Success(n) =>
-            n shouldBe a[java.lang.Long]
-            n should be(l)
+          case Success(n) => getInteger(n) should contain(l)
         }
       }
     }
@@ -350,9 +570,7 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
 
         extractStringData(l.toString, e) match {
           case Failure(t) => fail(t.getMessage)
-          case Success(n) =>
-            n shouldBe a[java.lang.Long]
-            n should be(l)
+          case Success(n) => getInteger(n) should contain(l)
         }
       }
     }
@@ -363,11 +581,12 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
           val e = doc.createElement(ElementNames.NUMBER)
           e.setAttribute(AttributeNames.PRECISION, "2")
 
+          val expected = java.math.BigDecimal.valueOf(l, 2)
+
           extractStringData(l.toString, e) match {
             case Failure(t) => fail(t.getMessage)
-            case Success(n: java.math.BigDecimal) =>
-              n.compareTo(java.math.BigDecimal.valueOf(l, 2)) should be(0)
-            case Success(t) => fail(s"Invalid return type '${t.getClass.getCanonicalName}'!")
+            case Success(s) =>
+              getDecimal(s).exists(_.compareTo(expected) == 0) should be(true)
           }
         }
       }
