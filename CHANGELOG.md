@@ -20,6 +20,8 @@ Please follow the listed conventions when editing this file:
 
 ## Unreleased
 
+## 3.0.0 (2017-10-06)
+
 ### Added
 
 - `DataElement` trait with subclasses for data type wrappers
