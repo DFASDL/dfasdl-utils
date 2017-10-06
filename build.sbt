@@ -36,12 +36,33 @@ lazy val benchmarks =
     .settings(
       name := "dfasdl-utils-benchmarks",
       libraryDependencies ++= Seq(
+        library.jai,
+        library.jamm,
         library.scalaCheck % Test,
         library.scalaTest  % Test
       ),
-      publishArtifact := false
+      publishArtifact := false,
+      javaOptions in run ++= (dependencyClasspath in Compile).map(makeAgentOptions).value,
+      javaOptions in run ++= Seq(
+        "-Xms2g",
+        "-Xmx2g",
+        "-XX:MaxMetaspaceSize=1g"
+      ),
+      fork in run := true
     )
     .dependsOn(dfasdlUtils)
+
+/**
+  * Helper function to generate options for instrumenting memory analysis.
+  *
+  * @param cp The current classpath.
+  * @return A list of options (strings).
+  */
+def makeAgentOptions(cp: Classpath): Seq[String] = {
+  val jammJar = cp.map(_.data).filter(_.toString.contains("jamm")).headOption.map(j => s"-javaagent:$j")
+  val jaiJar = cp.map(_.data).filter(_.toString.contains("instrumenter")).headOption.map(j => s"-javaagent:$j")
+  Seq(jammJar, jaiJar).flatten
+}
 
 // *****************************************************************************
 // Library dependencies
@@ -52,17 +73,22 @@ lazy val library =
     object Version {
       val cats         = "0.9.0"
       val dfasdlCore   = "1.0"
+      val jai          = "3.0.1"
+      val jamm         = "0.3.2"
       val scalaCheck   = "1.13.5"
       val scalaCheckTb = "0.2.2"
       val scalaTest    = "3.0.4"
       val shapeless    = "2.3.2"
     }
-    val cats           = "org.typelevel"  %% "cats"                        % Version.cats
-    val dfasdlCore     = "org.dfasdl"     %% "dfasdl-core"                 % Version.dfasdlCore
-    val scalaCheck     = "org.scalacheck" %% "scalacheck"                  % Version.scalaCheck
-    val scalaCheckTbDT = "com.47deg"      %% "scalacheck-toolbox-datetime" % Version.scalaCheckTb
-    val scalaTest      = "org.scalatest"  %% "scalatest"                   % Version.scalaTest
-    val shapeless      = "com.chuusai"    %% "shapeless"                   % Version.shapeless
+    val cats           = "org.typelevel"      %% "cats"                        % Version.cats
+    val dfasdlCore     = "org.dfasdl"         %% "dfasdl-core"                 % Version.dfasdlCore
+    val scalaCheck     = "org.scalacheck"     %% "scalacheck"                  % Version.scalaCheck
+    val scalaCheckTbDT = "com.47deg"          %% "scalacheck-toolbox-datetime" % Version.scalaCheckTb
+    val scalaTest      = "org.scalatest"      %% "scalatest"                   % Version.scalaTest
+    val shapeless      = "com.chuusai"        %% "shapeless"                   % Version.shapeless
+    // Dependencies for instrumenting and profiling.
+    val jai = "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" % Version.jai
+    val jamm           = "com.github.jbellis" %  "jamm"      % Version.jamm
   }
 
 // *****************************************************************************
@@ -90,8 +116,7 @@ lazy val commonSettings =
     ),
     scalacOptions ++= Seq(
       "-deprecation",
-      "-encoding",
-      "UTF-8",
+      "-encoding", "UTF-8",
       "-feature",
       "-language:_",
       "-target:jvm-1.8",
@@ -100,6 +125,7 @@ lazy val commonSettings =
       "-Xfuture",
       "-Xlint",
       "-Ydelambdafy:method",
+//      "-Ypartial-unification",
       "-Yno-adapted-args",
       "-Ywarn-numeric-widen",
       "-Ywarn-unused-import",
@@ -161,6 +187,6 @@ lazy val scalafmtSettings =
   Seq(
     scalafmtOnCompile := true,
     scalafmtOnCompile.in(Sbt) := false,
-    scalafmtVersion := "1.2.0"
+    scalafmtVersion := "1.3.0"
   )
 

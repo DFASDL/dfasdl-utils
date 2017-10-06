@@ -20,6 +20,15 @@ Please follow the listed conventions when editing this file:
 
 ## Unreleased
 
+### Added
+
+- `DataElement` trait with subclasses for data type wrappers
+- helper functions for data extraction from `DataElement`
+
+### Changed
+
+- element extractors use `DataElement` now instead of `Any`
+
 ## 2.0.0 (2017-08-31)
 
 ### Fixed
