@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2017  Contributors as noted in the AUTHORS.md file
+ * Copyright (C) 2014 - 2020  Contributors as noted in the AUTHORS.md file
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -303,8 +303,10 @@ class DataElementProcessorsTest extends BaseSpec with DataElementProcessors {
       describe("and is empty") {
         it(s"should set the content to the ${AttributeNames.DEFAULT_STRING} attribute value") {
           val element = doc.createElement("str")
-          element.setAttribute(AttributeNames.DEFAULT_STRING,
-                               "The Quick Brown Fox Jumps Over The Lazy Dog")
+          element.setAttribute(
+            AttributeNames.DEFAULT_STRING,
+            "The Quick Brown Fox Jumps Over The Lazy Dog"
+          )
 
           processString(element).getTextContent should be(
             "The Quick Brown Fox Jumps Over The Lazy Dog"
@@ -315,8 +317,10 @@ class DataElementProcessorsTest extends BaseSpec with DataElementProcessors {
           it("should be valid") {
             val element = doc.createElement("str")
             element.setAttribute(AttributeNames.LENGTH, "1")
-            element.setAttribute(AttributeNames.DEFAULT_STRING,
-                                 "The Quick Brown Fox Jumps Over The Lazy Dog")
+            element.setAttribute(
+              AttributeNames.DEFAULT_STRING,
+              "The Quick Brown Fox Jumps Over The Lazy Dog"
+            )
 
             processString(element).getTextContent should be(
               "The Quick Brown Fox Jumps Over The Lazy Dog"
@@ -328,8 +332,10 @@ class DataElementProcessorsTest extends BaseSpec with DataElementProcessors {
           it("should not modify the content set from the default value") {
             val element = doc.createElement("str")
             element.setAttribute(AttributeNames.MAX_LENGTH, "2")
-            element.setAttribute(AttributeNames.DEFAULT_STRING,
-                                 "The Quick Brown Fox Jumps Over The Lazy Dog")
+            element.setAttribute(
+              AttributeNames.DEFAULT_STRING,
+              "The Quick Brown Fox Jumps Over The Lazy Dog"
+            )
 
             processString(element).getTextContent should be(
               "The Quick Brown Fox Jumps Over The Lazy Dog"
@@ -341,8 +347,10 @@ class DataElementProcessorsTest extends BaseSpec with DataElementProcessors {
       describe("and is not empty") {
         it("should not replace the content") {
           val element = doc.createElement("str")
-          element.setAttribute(AttributeNames.DEFAULT_STRING,
-                               "The Quick Brown Fox Jumps Over The Lazy Dog")
+          element.setAttribute(
+            AttributeNames.DEFAULT_STRING,
+            "The Quick Brown Fox Jumps Over The Lazy Dog"
+          )
           element.setTextContent("Turrican")
 
           processString(element).getTextContent should be("Turrican")
@@ -352,8 +360,10 @@ class DataElementProcessorsTest extends BaseSpec with DataElementProcessors {
           it("should not be valid") {
             val element = doc.createElement("str")
             element.setAttribute(AttributeNames.LENGTH, "1")
-            element.setAttribute(AttributeNames.DEFAULT_STRING,
-                                 "The Quick Brown Fox Jumps Over The Lazy Dog")
+            element.setAttribute(
+              AttributeNames.DEFAULT_STRING,
+              "The Quick Brown Fox Jumps Over The Lazy Dog"
+            )
             element.setTextContent("Turrican")
 
             intercept[LengthValidationException] {
@@ -366,8 +376,10 @@ class DataElementProcessorsTest extends BaseSpec with DataElementProcessors {
           it("should modify the content") {
             val element = doc.createElement("str")
             element.setAttribute(AttributeNames.MAX_LENGTH, "8")
-            element.setAttribute(AttributeNames.DEFAULT_STRING,
-                                 "The Quick Brown Fox Jumps Over The Lazy Dog")
+            element.setAttribute(
+              AttributeNames.DEFAULT_STRING,
+              "The Quick Brown Fox Jumps Over The Lazy Dog"
+            )
             element.setTextContent("Turrican II")
 
             processString(element).getTextContent should be("Turrican")

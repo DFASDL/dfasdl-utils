@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2017  Contributors as noted in the AUTHORS.md file
+ * Copyright (C) 2014 - 2020  Contributors as noted in the AUTHORS.md file
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -29,8 +29,10 @@ import org.w3c.dom.traversal.{ DocumentTraversal, NodeFilter }
 import org.xml.sax.InputSource
 
 class ElementHelpersTest extends FunSpec with Matchers with ElementHelpers {
-  def createDocumentBuilder(useSchema: Boolean = true,
-                            schemaDefinition: String = "/org/dfasdl/dfasdl.xsd"): DocumentBuilder =
+  def createDocumentBuilder(
+      useSchema: Boolean = true,
+      schemaDefinition: String = "/org/dfasdl/dfasdl.xsd"
+  ): DocumentBuilder =
     if (useSchema) {
       val xsdMain: InputStream = getClass.getResourceAsStream(schemaDefinition)
 
@@ -61,10 +63,12 @@ class ElementHelpersTest extends FunSpec with Matchers with ElementHelpers {
         val doc     = builder.parse(new InputSource(new StringReader(xml)))
         doc.getDocumentElement.normalize()
         val traversal = doc.asInstanceOf[DocumentTraversal]
-        val nodeIterator = traversal.createNodeIterator(doc.getDocumentElement,
-                                                        NodeFilter.SHOW_ELEMENT,
-                                                        new DataElementFilter(),
-                                                        true)
+        val nodeIterator = traversal.createNodeIterator(
+          doc.getDocumentElement,
+          NodeFilter.SHOW_ELEMENT,
+          new DataElementFilter(),
+          true
+        )
         var nextNode    = nodeIterator.nextNode()
         var cnt         = 0
         val expectedIds = List("columnStr", "column2Str", "choiceNum", "choiceStr")

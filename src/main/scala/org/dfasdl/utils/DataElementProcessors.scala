@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2017  Contributors as noted in the AUTHORS.md file
+ * Copyright (C) 2014 - 2020  Contributors as noted in the AUTHORS.md file
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -46,7 +46,7 @@ trait DataElementProcessors {
         else
           element.getAttribute(AttributeNames.DECIMAL_SEPARATOR)
       val allowedCharacters = s"[\\d$separatorRegex]"
-      val cleanedData       = data filter (c => s"$c" matches allowedCharacters)
+      val cleanedData       = data filter (c => s"${c.toString}" matches allowedCharacters)
       if (data.startsWith("-"))
         s"-$cleanedData"
       else
@@ -94,7 +94,7 @@ trait DataElementProcessors {
             .getAttribute(AttributeNames.LENGTH)
             .toInt)
         throw new LengthValidationException(
-          s"Length of ${element.getAttribute(AttributeNames.LENGTH)} expected but was ${digits.length}!"
+          s"Length of ${element.getAttribute(AttributeNames.LENGTH)} expected but was ${digits.length.toString}!"
         )
 
       val shortenedDigits =
@@ -148,7 +148,7 @@ trait DataElementProcessors {
             .getAttribute(AttributeNames.LENGTH)
             .toInt)
         throw new LengthValidationException(
-          s"Length of ${element.getAttribute(AttributeNames.LENGTH)} expected but was ${trimmedData.length}!"
+          s"Length of ${element.getAttribute(AttributeNames.LENGTH)} expected but was ${trimmedData.length.toString}!"
         )
 
       if (element.hasAttribute(AttributeNames.MAX_LENGTH) && trimmedData.length > element

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2017  Contributors as noted in the AUTHORS.md file
+ * Copyright (C) 2014 - 2020  Contributors as noted in the AUTHORS.md file
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -200,19 +200,21 @@ class DocumentHelpersTest extends BaseSpec with DocumentHelpers {
           val xmlIn: InputStream =
             getClass.getResourceAsStream("/org/dfasdl/utils/helpers/getSortedIds-complex.xml")
           val xml = scala.io.Source.fromInputStream(xmlIn).mkString
-          val expected = List("columnStr",
-                              "column",
-                              "column2Str",
-                              "column2",
-                              "columns",
-                              "entries",
-                              "vcards",
-                              "choiceNum",
-                              "choiceElem",
-                              "choiceStr",
-                              "choiceElem2",
-                              "choice",
-                              "secondPart")
+          val expected = List(
+            "columnStr",
+            "column",
+            "column2Str",
+            "column2",
+            "columns",
+            "entries",
+            "vcards",
+            "choiceNum",
+            "choiceElem",
+            "choiceStr",
+            "choiceElem2",
+            "choice",
+            "secondPart"
+          )
           getSortedIdList(xml) should be(expected)
         }
       }

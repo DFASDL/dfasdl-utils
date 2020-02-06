@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2017  Contributors as noted in the AUTHORS.md file
+ * Copyright (C) 2014 - 2020  Contributors as noted in the AUTHORS.md file
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -96,7 +96,10 @@ trait DataElementExtractors extends ElementHelpers {
     * @param e The element that describes the data.
     * @return Either an error or an integer number.
     */
-  final protected def extractInteger(d: String, e: Element): Try[Long] = Try(d.toLong)
+  final protected def extractInteger(d: String, e: Element): Try[Long] = {
+    val _ = e // Silence unused warning while staying binary compatible.
+    Try(d.toLong)
+  }
 
   /**
     * Extract the data from a string element.
