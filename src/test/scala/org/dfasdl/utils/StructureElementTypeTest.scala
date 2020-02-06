@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2017  Contributors as noted in the AUTHORS.md file
+ * Copyright (C) 2014 - 2020  Contributors as noted in the AUTHORS.md file
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as

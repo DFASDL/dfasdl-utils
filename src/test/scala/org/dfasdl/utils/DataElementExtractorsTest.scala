@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2017  Contributors as noted in the AUTHORS.md file
+ * Copyright (C) 2014 - 2020  Contributors as noted in the AUTHORS.md file
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -23,11 +23,14 @@ import java.time.{ OffsetDateTime, ZoneOffset, ZonedDateTime }
 
 import com.fortysevendeg.scalacheck.datetime.jdk8.ArbitraryJdk8._
 import org.dfasdl.utils.types.extractors._
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 import scala.util.{ Failure, Success }
 
-class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataElementExtractors {
+class DataElementExtractorsTest
+    extends BaseSpec
+    with ScalaCheckPropertyChecks
+    with DataElementExtractors {
 
   describe("extractData") {
     val doc = createNewDocument()
@@ -426,12 +429,11 @@ class DataElementExtractorsTest extends BaseSpec with PropertyChecks with DataEl
             n.toPlainString.takeWhile(_ != '.')
 
         val p = prefix.reverse.zipWithIndex
-          .map(
-            t =>
-              if ((t._2 + 1) % 3 == 0)
-                s"${t._1}$del"
-              else
-                t._1
+          .map(t =>
+            if ((t._2 + 1) % 3 == 0)
+              s"${t._1}$del"
+            else
+              t._1
           )
           .mkString
           .reverse

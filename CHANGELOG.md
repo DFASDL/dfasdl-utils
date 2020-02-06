@@ -20,6 +20,12 @@ Please follow the listed conventions when editing this file:
 
 ## Unreleased
 
+## 3.0.1 (2020-02-06)
+
+- cross publish for Scala 2.11, 2.12 and 2.13
+- adjust compiler settings
+- update copyright headers
+
 ## 3.0.0 (2017-10-06)
 
 ### Added

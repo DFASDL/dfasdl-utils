@@ -16,7 +16,7 @@ automatically.
 This repository contains the utils module which provides helpful functions
 and data types. It depends on the dfasdl-core package.
 
-It is cross build for scala 2.11 and 2.12.
+It is cross build for scala 2.11, 2.12 and 2.13.
 
 Releases are published on bintray and should be synced to jcenter. To use
 the bintray repository directly just add the appropriate resolver to your

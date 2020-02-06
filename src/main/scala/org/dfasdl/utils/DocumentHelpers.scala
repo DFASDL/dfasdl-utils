@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - 2017  Contributors as noted in the AUTHORS.md file
+ * Copyright (C) 2014 - 2020  Contributors as noted in the AUTHORS.md file
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -52,8 +52,9 @@ trait DocumentHelpers extends ElementHelpers {
         for (count <- 0 until choice.getChildNodes.getLength;
              c = choice.getChildNodes.item(count)
              if c != null && c.getNodeName == ElementNames.CHOICE_ELEMENT)
-          yield
-            Map(c.asInstanceOf[Element] -> getChildDataElementsFromElement(c.asInstanceOf[Element]))
+          yield Map(
+            c.asInstanceOf[Element] -> getChildDataElementsFromElement(c.asInstanceOf[Element])
+          )
       candidates.flatten.toMap
     }
   }
@@ -78,8 +79,10 @@ trait DocumentHelpers extends ElementHelpers {
     * @return A document builder using the DFASDL schema.
     */
   @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments", "org.wartremover.warts.Null"))
-  def createDocumentBuilder(useSchema: Boolean = true,
-                            schemaDefinition: String = "/org/dfasdl/dfasdl.xsd"): DocumentBuilder =
+  def createDocumentBuilder(
+      useSchema: Boolean = true,
+      schemaDefinition: String = "/org/dfasdl/dfasdl.xsd"
+  ): DocumentBuilder =
     if (useSchema) {
       val xsdMain: InputStream = getClass.getResourceAsStream(schemaDefinition)
 
