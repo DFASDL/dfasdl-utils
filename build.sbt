@@ -47,7 +47,8 @@ lazy val benchmarks =
         "-Xmx2g",
         "-XX:MaxMetaspaceSize=1g"
       ),
-      fork in run := true
+      fork in run := true,
+      wartremoverWarnings in (Compile, compile) := Seq()
     )
     .dependsOn(dfasdlUtils)
 
